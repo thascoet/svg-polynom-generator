@@ -186,7 +186,12 @@ function updateSvgPolygons(polygonCorners) {
     polygonCorners.forEach((corners, groupIndex) => {
         const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
         polygon.setAttribute('points', corners.map(([x, y]) => `${x},${y}`).join(' '));
-        polygon.setAttribute('fill', getColor(groupIndex, polygonCorners.length));
+        const color = getColor(groupIndex, polygonCorners.length);
+        polygon.setAttribute('fill', color);
+        polygon.setAttribute('fill-opacity', '0.4');
+        polygon.setAttribute('stroke', color);
+        polygon.setAttribute('stroke-width', '0.05');
+        polygon.setAttribute('stroke-opacity', '1');
         svgGrid.appendChild(polygon);
     });
 }
