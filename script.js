@@ -2,11 +2,22 @@ const mainGrid = document.getElementById('main-grid');
 const cellSelected = [];
 
 const cellSelectedElement = document.getElementById('cell-selected');
+
+/**
+ * Update the visible text for the selected cells list.
+ * @returns {void}
+ */
 function updateSelectedCellsElement() {
     cellSelectedElement.textContent = `Selected Cells: ${cellSelected.map(cell => `(${cell[0]},${cell[1]})`).join(', ')}`;
 }
 
 const groupedCellSelectedElement = document.getElementById('grouped-cell-selected');
+
+/**
+ * Update the visible text for grouped connected cells.
+ * @param {Array<Array<[number, number]>>} groupedCells
+ * @returns {void}
+ */
 function updateGroupedSelectedCellsElement(groupedCells) {
     groupedCellSelectedElement.textContent = `Grouped Selected Cells: ${groupedCells.map((group, i) => `Group ${i + 1}: ${group.map(([x, y]) => `(${x},${y})`).join(', ')}`).join(', ')}`;
 }
@@ -32,6 +43,11 @@ for (let y = 0; y < 10; y++) {
     }
 }
 
+/**
+ * Group selected cells into connected components using orthogonal adjacency using a Breadth-First Search algorithm.
+ * @param {Array<[number, number]>} cells
+ * @returns {Array<Array<[number, number]>>}
+ */
 function groupConnectedCells(cells) {
     const visited = new Set();
     const groups = [];
@@ -65,11 +81,22 @@ function groupConnectedCells(cells) {
     return groups;
 }
 
+/**
+ * Return a color string for a group index based on the total number of groups.
+ * @param {number} index
+ * @param {number} maxColors
+ * @returns {string}
+ */
 function getColor(index, maxColors) {
     const hue = (index / maxColors) * 360;
     return `hsl(${hue}, 100%, 50%)`;
 }
 
+/**
+ * Update the grid cell background colors for each connected group.
+ * @param {Array<Array<[number, number]>>} groupedCells
+ * @returns {void}
+ */
 function updateSelectedCellColor(groupedCells) {
     
     document.querySelectorAll('#main-grid div').forEach(div => {
@@ -85,6 +112,10 @@ function updateSelectedCellColor(groupedCells) {
     });
 }
 
+/**
+ * Calculate polygon corners for a connected cell group using a theo pavlidis algorithm.
+ * @type {function(Array<[number, number]>): Array<[number, number]>}
+ */
 const calculateAssociatePolygonCorners = (() => {
 
     const RIGHT = 0b00;
@@ -99,6 +130,10 @@ const calculateAssociatePolygonCorners = (() => {
         ERROR, ERROR, ERROR, ERROR, LEFT , UP   , LEFT , RIGHT, RIGHT, RIGHT, UP   , LEFT , ERROR, ERROR, ERROR, ERROR
     ];
 
+    /**
+     * @param {Array<[number, number]>} cells
+     * @returns {Array<[number, number]>}
+     */
     return function(cells) {
         const minX = Math.min(...cells.map(c => c[0]));
         const maxX = Math.max(...cells.map(c => c[0]));
@@ -139,6 +174,11 @@ const calculateAssociatePolygonCorners = (() => {
     }
 })();
 
+/**
+ * Render SVG polygons for each connected group of cells.
+ * @param {Array<Array<[number, number]>>} polygonCorners
+ * @returns {void}
+ */
 function updateSvgPolygons(polygonCorners) {
     const svgGrid = document.getElementById('svg-grid');
     svgGrid.innerHTML = '';
@@ -151,6 +191,10 @@ function updateSvgPolygons(polygonCorners) {
     });
 }
 
+/**
+ * Refresh selected cell state, grouped cell state, and polygon rendering.
+ * @returns {void}
+ */
 function updateSelectedCells() {
     updateSelectedCellsElement();
     const groupedCells = groupConnectedCells(cellSelected);
